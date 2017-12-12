@@ -28,7 +28,6 @@ import (
 	"github.com/golang/glog"
 
 	crdv1 "github.com/kubernetes-incubator/external-storage/snapshot/pkg/apis/crd/v1"
-	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/cloudprovider"
 	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/cloudprovider/providers/aws"
 	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/volume"
 )
@@ -49,7 +48,7 @@ func GetPluginName() string {
 	return "aws_ebs"
 }
 
-func (a *awsEBSPlugin) Init(cloud cloudprovider.Interface) {
+func (a *awsEBSPlugin) Init(cloud interface{}) {
 	a.cloud = cloud.(*aws.Cloud)
 }
 
