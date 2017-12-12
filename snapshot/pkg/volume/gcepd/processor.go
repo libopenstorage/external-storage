@@ -23,7 +23,6 @@ import (
 
 	"github.com/golang/glog"
 	crdv1 "github.com/kubernetes-incubator/external-storage/snapshot/pkg/apis/crd/v1"
-	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/cloudprovider"
 	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/cloudprovider/providers/gce"
 	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/volume"
 	"k8s.io/api/core/v1"
@@ -52,7 +51,7 @@ func GetPluginName() string {
 	return gcePersistentDiskPluginName
 }
 
-func (plugin *gcePersistentDiskPlugin) Init(cloud cloudprovider.Interface) {
+func (plugin *gcePersistentDiskPlugin) Init(cloud interface{}) {
 	plugin.cloud = cloud.(*gce.Cloud)
 }
 

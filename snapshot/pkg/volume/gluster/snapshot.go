@@ -22,7 +22,6 @@ import (
 
 	"github.com/golang/glog"
 	crdv1 "github.com/kubernetes-incubator/external-storage/snapshot/pkg/apis/crd/v1"
-	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/cloudprovider"
 	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/volume"
 	"github.com/pborman/uuid"
 	"k8s.io/api/core/v1"
@@ -49,7 +48,7 @@ func GetPluginName() string {
 	return "glusterfs"
 }
 
-func (h *glusterfsPlugin) Init(_ cloudprovider.Interface) {
+func (h *glusterfsPlugin) Init(_ interface{}) {
 }
 
 func (h *glusterfsPlugin) SnapshotCreate(

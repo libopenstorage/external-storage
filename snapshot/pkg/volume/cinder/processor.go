@@ -27,7 +27,6 @@ import (
 	"github.com/golang/glog"
 
 	crdv1 "github.com/kubernetes-incubator/external-storage/snapshot/pkg/apis/crd/v1"
-	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/cloudprovider"
 	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/cloudprovider/providers/openstack"
 	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/volume"
 	k8sVol "k8s.io/kubernetes/pkg/volume"
@@ -40,7 +39,7 @@ type cinderPlugin struct {
 var _ volume.Plugin = &cinderPlugin{}
 
 // Init inits volume plugin
-func (c *cinderPlugin) Init(cloud cloudprovider.Interface) {
+func (c *cinderPlugin) Init(cloud interface{}) {
 	c.cloud = cloud.(*openstack.OpenStack)
 }
 
