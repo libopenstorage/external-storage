@@ -48,8 +48,9 @@ func GetPluginName() string {
 	return "aws_ebs"
 }
 
-func (a *awsEBSPlugin) Init(cloud interface{}) {
+func (a *awsEBSPlugin) Init(cloud interface{}) error {
 	a.cloud = cloud.(*aws.Cloud)
+	return nil
 }
 
 func (a *awsEBSPlugin) SnapshotCreate(
