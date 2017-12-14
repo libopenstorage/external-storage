@@ -39,8 +39,9 @@ type cinderPlugin struct {
 var _ volume.Plugin = &cinderPlugin{}
 
 // Init inits volume plugin
-func (c *cinderPlugin) Init(cloud interface{}) {
+func (c *cinderPlugin) Init(cloud interface{}) error {
 	c.cloud = cloud.(*openstack.OpenStack)
+	return nil
 }
 
 // RegisterPlugin creates an uninitialized cinder plugin

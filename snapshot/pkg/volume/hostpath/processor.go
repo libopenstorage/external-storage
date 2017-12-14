@@ -51,7 +51,8 @@ func GetPluginName() string {
 	return "hostPath"
 }
 
-func (h *hostPathPlugin) Init(_ interface{}) {
+func (h *hostPathPlugin) Init(_ interface{}) error {
+	return nil
 }
 
 func (h *hostPathPlugin) SnapshotCreate(
