@@ -25,7 +25,7 @@ import (
 // Plugin defines functions that should be implemented by the volume plugin
 type Plugin interface {
 	// Init inits volume plugin
-	Init(interface{})
+	Init(interface{}) error
 	// SnapshotCreate creates a VolumeSnapshot from a PersistentVolumeSpec
 	SnapshotCreate(*v1.PersistentVolume, *map[string]string) (*crdv1.VolumeSnapshotDataSource, *[]crdv1.VolumeSnapshotCondition, error)
 	// SnapshotDelete deletes a VolumeSnapshot

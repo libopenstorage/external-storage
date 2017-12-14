@@ -48,7 +48,8 @@ func GetPluginName() string {
 	return "glusterfs"
 }
 
-func (h *glusterfsPlugin) Init(_ interface{}) {
+func (h *glusterfsPlugin) Init(_ interface{}) error {
+	return nil
 }
 
 func (h *glusterfsPlugin) SnapshotCreate(pv *v1.PersistentVolume, tags *map[string]string) (*crdv1.VolumeSnapshotDataSource, *[]crdv1.VolumeSnapshotCondition, error) {

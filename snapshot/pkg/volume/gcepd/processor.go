@@ -51,8 +51,9 @@ func GetPluginName() string {
 	return gcePersistentDiskPluginName
 }
 
-func (plugin *gcePersistentDiskPlugin) Init(cloud interface{}) {
+func (plugin *gcePersistentDiskPlugin) Init(cloud interface{}) error {
 	plugin.cloud = cloud.(*gce.Cloud)
+	return nil
 }
 
 func (plugin *gcePersistentDiskPlugin) SnapshotCreate(pv *v1.PersistentVolume, tags *map[string]string) (*crdv1.VolumeSnapshotDataSource, *[]crdv1.VolumeSnapshotCondition, error) {
