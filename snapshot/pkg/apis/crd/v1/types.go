@@ -24,6 +24,13 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
+type PortworxSnapshotType string
+
+const (
+	PortworxSnapshotTypeCloud PortworxSnapshotType = "cloud"
+	PortworxSnapshotTypeLocal PortworxSnapshotType = "local"
+)
+
 const (
 	// VolumeSnapshotDataResourcePlural is "volumesnapshotdatas"
 	VolumeSnapshotDataResourcePlural = "volumesnapshotdatas"
@@ -231,7 +238,13 @@ type GCEPersistentDiskSnapshotSource struct {
 // PortworxVolumeSnapshotSource is Portworx volume snapshot source
 type PortworxVolumeSnapshotSource struct {
 	// Unique id of the Portworx snapshot.
-	SnapshotID string `json:"snapshotId"`
+	SnapshotID string `json:"snapshotId,omitempty"`
+	// SnapshotType is the type of the snapshot
+	SnapshotType PortworxSnapshotType `json:"snapshotType,omitempty"`
+	// SnapshotCredID is an optional credentials ID for the snapshot. This is used for cloud snaps.
+	SnapshotCredID string `json:"snapshotCredID,omitempty"`
+	// SnapshotData stores the name of VolumeSnapshotData for this snapshot
+	SnapshotData string `json:"snapshotData,omitempty"`
 }
 
 // VolumeSnapshotDataSource represents the actual location and type of the snapshot. Only one of its members may be specified.
