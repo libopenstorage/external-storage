@@ -370,7 +370,7 @@ func (vs *volumeSnapshotter) updateSnapshotIfExists(uniqueSnapshotName string, s
 	// triggered through cloud provider, bind it and return pending state
 	if snapshotDataObj = vs.getSnapshotDataFromSnapshotName(uniqueSnapshotName); snapshotDataObj != nil {
 		glog.Infof("Find snapshot data object %s from snapshot %s", snapshotDataObj.Metadata.Name, uniqueSnapshotName)
-		snapshotObj, err := vs.bindandUpdateVolumeSnapshot(snapshot, snapshotDataObj.Metadata.Name, nil)
+		snapshotObj, err := vs.updateVolumeSnapshot(snapshot, snapshotDataObj.Metadata.Name, nil)
 		if err != nil {
 			return statusError, snapshot, err
 		}
@@ -392,7 +392,7 @@ func (vs *volumeSnapshotter) updateSnapshotIfExists(uniqueSnapshotName string, s
 		return statusError, snapshot, err
 	}
 	glog.Infof("updateSnapshotIfExists: update VolumeSnapshot status and bind VolumeSnapshotData to VolumeSnapshot %s.", uniqueSnapshotName)
-	snapshotObj, err := vs.bindandUpdateVolumeSnapshot(snapshot, snapshotDataObj.Metadata.Name, conditions)
+	snapshotObj, err := vs.updateVolumeSnapshot(snapshot, snapshotDataObj.Metadata.Name, conditions)
 	if err != nil {
 		return statusError, nil, err
 	}
@@ -494,7 +494,7 @@ func (vs *volumeSnapshotter) createSnapshot(uniqueSnapshotName string, snapshot 
 	snapshotDataSource, snapStatus, err = vs.takeSnapshot(snapshot, pv, tags)
 	if err != nil || snapshotDataSource == nil {
 		if snapStatus != nil && len(*snapStatus) > 0 {
-			_, updateErr := vs.bindandUpdateVolumeSnapshot(snapshot, "", snapStatus)
+			_, updateErr := vs.updateVolumeSnapshot(snapshot, "", snapStatus)
 			if updateErr != nil {
 				glog.Errorf("createSnapshot: Error updating failed volume snapshot %s: %v", uniqueSnapshotName, updateErr)
 			}
@@ -514,7 +514,7 @@ func (vs *volumeSnapshotter) createSnapshot(uniqueSnapshotName string, snapshot 
 	}
 
 	glog.Infof("createSnapshot: Update VolumeSnapshot status and bind VolumeSnapshotData to VolumeSnapshot %s.", uniqueSnapshotName)
-	snapshotObj, err := vs.bindandUpdateVolumeSnapshot(snapshot, snapshotDataObj.Metadata.Name, snapStatus)
+	snapshotObj, err := vs.updateVolumeSnapshot(snapshot, snapshotDataObj.Metadata.Name, snapStatus)
 	if err != nil {
 		glog.Errorf("createSnapshot: Error updating volume snapshot %s: %v", uniqueSnapshotName, err)
 		return fmt.Errorf("Failed to update VolumeSnapshot for snapshot %s", uniqueSnapshotName)
@@ -794,8 +794,8 @@ func (vs *volumeSnapshotter) UpdateVolumeSnapshotStatus(snapshot *crdv1.VolumeSn
 	return snapshot, nil
 }
 
-// Bind the VolumeSnapshot and VolumeSnapshotData and udpate the status
-func (vs *volumeSnapshotter) bindandUpdateVolumeSnapshot(snapshot *crdv1.VolumeSnapshot, snapshotDataName string, status *[]crdv1.VolumeSnapshotCondition) (*crdv1.VolumeSnapshot, error) {
+// Bind the VolumeSnapshot and VolumeSnapshotData if snapshotDataName is given and updates the status
+func (vs *volumeSnapshotter) updateVolumeSnapshot(snapshot *crdv1.VolumeSnapshot, snapshotDataName string, status *[]crdv1.VolumeSnapshotCondition) (*crdv1.VolumeSnapshot, error) {
 	var snapshotObj crdv1.VolumeSnapshot
 
 	glog.Infof("In bindVolumeSnapshotDataToVolumeSnapshot")
