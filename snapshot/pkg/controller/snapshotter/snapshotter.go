@@ -269,9 +269,9 @@ func (vs *volumeSnapshotter) takeSnapshot(
 		glog.Warningf("failed to snapshot %#v, err: %v", spec, err)
 	} else {
 		glog.Infof("snapshot created: %v. Conditions: %#v", snapDataSource, snapConditions)
-		return snapDataSource, snapConditions, nil
 	}
-	return nil, nil, nil
+
+	return snapDataSource, snapConditions, err
 }
 
 // This is the function responsible for determining the correct volume plugin to use,
@@ -493,7 +493,18 @@ func (vs *volumeSnapshotter) createSnapshot(uniqueSnapshotName string, snapshot 
 
 	snapshotDataSource, snapStatus, err = vs.takeSnapshot(snapshot, pv, tags)
 	if err != nil || snapshotDataSource == nil {
-		return fmt.Errorf("Failed to take snapshot of the volume %s: %q", pv.Name, err)
+		if snapStatus != nil && len(*snapStatus) > 0 {
+			_, updateErr := vs.bindandUpdateVolumeSnapshot(snapshot, "", snapStatus)
+			if updateErr != nil {
+				glog.Errorf("createSnapshot: Error updating failed volume snapshot %s: %v", uniqueSnapshotName, updateErr)
+			}
+		}
+
+		if err != nil {
+			return fmt.Errorf("Failed to take snapshot of the volume %s: %q", pv.Name, err)
+		} else {
+			return fmt.Errorf("Failed to take snapshot of the volume %s", pv.Name)
+		}
 	}
 
 	glog.Infof("createSnapshot: create VolumeSnapshotData object for VolumeSnapshot %s.", uniqueSnapshotName)
