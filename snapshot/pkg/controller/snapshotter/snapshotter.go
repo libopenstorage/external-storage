@@ -35,7 +35,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	ccache "k8s.io/client-go/tools/cache"
-	"k8s.io/kubernetes/pkg/controller"
 	"k8s.io/kubernetes/pkg/util/goroutinemap"
 	"k8s.io/kubernetes/pkg/util/goroutinemap/exponentialbackoff"
 )
@@ -138,7 +137,7 @@ func NewVolumeSnapshotter(
 
 func (vs *volumeSnapshotter) Run(stopCh <-chan struct{}) {
 	go vs.controller.Run(stopCh)
-	if !controller.WaitForCacheSync("snapshotdata-cache", stopCh, vs.controller.HasSynced) {
+	if !ccache.WaitForCacheSync(stopCh, vs.controller.HasSynced) {
 		return
 	}
 }

@@ -29,7 +29,7 @@ import (
 	crdv1 "github.com/kubernetes-incubator/external-storage/snapshot/pkg/apis/crd/v1"
 	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/cloudprovider/providers/openstack"
 	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/volume"
-	k8sVol "k8s.io/kubernetes/pkg/volume/util"
+	helpers "k8s.io/cloud-provider/volume/helpers"
 )
 
 type cinderPlugin struct {
@@ -123,8 +123,7 @@ func (c *cinderPlugin) SnapshotRestore(snapshotData *crdv1.VolumeSnapshotData, p
 	snapID := snapshotData.Spec.CinderSnapshot.SnapshotID
 	volName := pvName
 	capacity := pvc.Spec.Resources.Requests[v1.ResourceName(v1.ResourceStorage)]
-	requestedSz := capacity.Value()
-	szGB := k8sVol.RoundUpSize(requestedSz, 1024*1024*1024)
+	szGB := helpers.RoundUpToGB(capacity)
 
 	for k, v := range parameters {
 		switch strings.ToLower(k) {

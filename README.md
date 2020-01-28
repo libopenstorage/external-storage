@@ -1,4 +1,4 @@
-Although many of these recipes still work, this repo is now deprecated, moving work to https://github.com/kubernetes-sigs/sig-storage-lib-external-provisioner, come join us there !  
+Although many of these recipes still work, this repo is now deprecated, moving work to https://sigs.k8s.io/sig-storage-lib-external-provisioner, come join us there !  
 
 # External Storage
 [![Build Status](https://travis-ci.org/kubernetes-incubator/external-storage.svg?branch=master)](https://travis-ci.org/kubernetes-incubator/external-storage)
@@ -14,7 +14,7 @@ An external provisioner is a dynamic PV provisioner whose code lives out-of-tree
 External provisioners work just like in-tree dynamic PV provisioners. A `StorageClass` object can specify an external provisioner instance to be its `provisioner` like it can in-tree provisioners. The instance will then watch for `PersistentVolumeClaims` that ask for the `StorageClass` and automatically create `PersistentVolumes` for them. For more information on how dynamic provisioning works, see [the docs](http://kubernetes.io/docs/user-guide/persistent-volumes/) or [this blog post](http://blog.kubernetes.io/2016/10/dynamic-provisioning-and-storage-in-kubernetes.html).
 
 ### How to use the library
-**`lib` is deprecated. The library has moved to [kubernetes-sigs/sig-storage-lib-external-provisioner](https://github.com/kubernetes-sigs/sig-storage-lib-external-provisioner).**
+**`lib` is deprecated. The library has moved to [kubernetes-sigs/sig-storage-lib-external-provisioner](https://sigs.k8s.io/sig-storage-lib-external-provisioner).**
 
 ## Roadmap
 

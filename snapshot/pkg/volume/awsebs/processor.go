@@ -23,7 +23,8 @@ import (
 
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	kvol "k8s.io/kubernetes/pkg/volume/util"
+	"k8s.io/cloud-provider/volume/helpers"
+	"k8s.io/kubernetes/pkg/volume/util"
 
 	"github.com/golang/glog"
 
@@ -127,12 +128,11 @@ func (a *awsEBSPlugin) SnapshotRestore(snapshotData *crdv1.VolumeSnapshotData, p
 
 	snapID := snapshotData.Spec.AWSElasticBlockStore.SnapshotID
 
-	tags["Name"] = kvol.GenerateVolumeName("Created from snapshot "+snapID+" ", pvName, 255) // AWS tags can have 255 characters
+	tags["Name"] = util.GenerateVolumeName("Created from snapshot "+snapID+" ", pvName, 255) // AWS tags can have 255 characters
 
 	capacity := pvc.Spec.Resources.Requests[v1.ResourceName(v1.ResourceStorage)]
-	requestBytes := capacity.Value()
 	// AWS works with gigabytes, convert to GiB with rounding up
-	requestGB := int(kvol.RoundUpSize(requestBytes, 1024*1024*1024))
+	requestGB := int(helpers.RoundUpToGB(capacity))
 	volumeOptions := &aws.VolumeOptions{
 		CapacityGB: requestGB,
 		Tags:       tags,

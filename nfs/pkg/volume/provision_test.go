@@ -30,7 +30,7 @@ import (
 	"syscall"
 	"testing"
 
-	"github.com/kubernetes-sigs/sig-storage-lib-external-provisioner/controller"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/controller"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -45,7 +45,7 @@ func TestCreateVolume(t *testing.T) {
 
 	tests := []struct {
 		name             string
-		options          controller.VolumeOptions
+		options          controller.ProvisionOptions
 		envKey           string
 		expectedServer   string
 		expectedPath     string
@@ -57,7 +57,7 @@ func TestCreateVolume(t *testing.T) {
 	}{
 		{
 			name: "succeed creating volume",
-			options: controller.VolumeOptions{
+			options: controller.ProvisionOptions{
 				PersistentVolumeReclaimPolicy: v1.PersistentVolumeReclaimDelete,
 				PVName:                        "pvc-1",
 				PVC:                           newClaim(resource.MustParse("1Ki"), []v1.PersistentVolumeAccessMode{v1.ReadWriteOnce, v1.ReadOnlyMany}, nil),
@@ -73,7 +73,7 @@ func TestCreateVolume(t *testing.T) {
 		},
 		{
 			name: "succeed creating volume again",
-			options: controller.VolumeOptions{
+			options: controller.ProvisionOptions{
 				PersistentVolumeReclaimPolicy: v1.PersistentVolumeReclaimDelete,
 				PVName:                        "pvc-2",
 				PVC:                           newClaim(resource.MustParse("1Ki"), []v1.PersistentVolumeAccessMode{v1.ReadWriteOnce, v1.ReadOnlyMany}, nil),
@@ -89,7 +89,7 @@ func TestCreateVolume(t *testing.T) {
 		},
 		{
 			name: "bad parameter",
-			options: controller.VolumeOptions{
+			options: controller.ProvisionOptions{
 				PersistentVolumeReclaimPolicy: v1.PersistentVolumeReclaimDelete,
 				PVName:                        "pvc-3",
 				PVC:                           newClaim(resource.MustParse("1Ki"), []v1.PersistentVolumeAccessMode{v1.ReadWriteOnce, v1.ReadOnlyMany}, nil),
@@ -106,7 +106,7 @@ func TestCreateVolume(t *testing.T) {
 		},
 		{
 			name: "bad server",
-			options: controller.VolumeOptions{
+			options: controller.ProvisionOptions{
 				PersistentVolumeReclaimPolicy: v1.PersistentVolumeReclaimDelete,
 				PVName:                        "pvc-4",
 				PVC:                           newClaim(resource.MustParse("1Ki"), []v1.PersistentVolumeAccessMode{v1.ReadWriteOnce, v1.ReadOnlyMany}, nil),
@@ -123,7 +123,7 @@ func TestCreateVolume(t *testing.T) {
 		},
 		{
 			name: "dir already exists",
-			options: controller.VolumeOptions{
+			options: controller.ProvisionOptions{
 				PersistentVolumeReclaimPolicy: v1.PersistentVolumeReclaimDelete,
 				PVName:                        "pvc-1",
 				PVC:                           newClaim(resource.MustParse("1Ki"), []v1.PersistentVolumeAccessMode{v1.ReadWriteOnce, v1.ReadOnlyMany}, nil),
@@ -140,7 +140,7 @@ func TestCreateVolume(t *testing.T) {
 		},
 		{
 			name: "error exporting",
-			options: controller.VolumeOptions{
+			options: controller.ProvisionOptions{
 				PersistentVolumeReclaimPolicy: v1.PersistentVolumeReclaimDelete,
 				PVName:                        "FAIL_TO_EXPORT_ME",
 				PVC:                           newClaim(resource.MustParse("1Ki"), []v1.PersistentVolumeAccessMode{v1.ReadWriteOnce, v1.ReadOnlyMany}, nil),
@@ -156,7 +156,7 @@ func TestCreateVolume(t *testing.T) {
 		},
 		{
 			name: "succeed creating volume last slot",
-			options: controller.VolumeOptions{
+			options: controller.ProvisionOptions{
 				PersistentVolumeReclaimPolicy: v1.PersistentVolumeReclaimDelete,
 				PVName:                        "pvc-3",
 				PVC:                           newClaim(resource.MustParse("1Ki"), []v1.PersistentVolumeAccessMode{v1.ReadWriteOnce, v1.ReadOnlyMany}, nil),
@@ -172,7 +172,7 @@ func TestCreateVolume(t *testing.T) {
 		},
 		{
 			name: "max export limit exceeded",
-			options: controller.VolumeOptions{
+			options: controller.ProvisionOptions{
 				PersistentVolumeReclaimPolicy: v1.PersistentVolumeReclaimDelete,
 				PVName:                        "pvc-3",
 				PVC:                           newClaim(resource.MustParse("1Ki"), []v1.PersistentVolumeAccessMode{v1.ReadWriteOnce, v1.ReadOnlyMany}, nil),
@@ -229,14 +229,14 @@ func TestValidateOptions(t *testing.T) {
 
 	tests := []struct {
 		name               string
-		options            controller.VolumeOptions
+		options            controller.ProvisionOptions
 		expectedGid        string
 		expectedRootSquash bool
 		expectError        bool
 	}{
 		{
 			name: "empty parameters",
-			options: controller.VolumeOptions{
+			options: controller.ProvisionOptions{
 				Parameters: map[string]string{},
 				PVC:        newClaim(resource.MustParse("1Ki"), nil, nil),
 			},
@@ -245,7 +245,7 @@ func TestValidateOptions(t *testing.T) {
 		},
 		{
 			name: "gid parameter value 'none'",
-			options: controller.VolumeOptions{
+			options: controller.ProvisionOptions{
 				Parameters: map[string]string{"gid": "none"},
 				PVC:        newClaim(resource.MustParse("1Ki"), nil, nil),
 			},
@@ -254,7 +254,7 @@ func TestValidateOptions(t *testing.T) {
 		},
 		{
 			name: "gid parameter value id",
-			options: controller.VolumeOptions{
+			options: controller.ProvisionOptions{
 				Parameters: map[string]string{"gid": "1"},
 				PVC:        newClaim(resource.MustParse("1Ki"), nil, nil),
 			},
@@ -263,31 +263,31 @@ func TestValidateOptions(t *testing.T) {
 		},
 		{
 			name:        "bad parameter name",
-			options:     controller.VolumeOptions{Parameters: map[string]string{"foo": "bar"}},
+			options:     controller.ProvisionOptions{Parameters: map[string]string{"foo": "bar"}},
 			expectedGid: "",
 			expectError: true,
 		},
 		{
 			name:        "bad gid parameter value string",
-			options:     controller.VolumeOptions{Parameters: map[string]string{"gid": "foo"}},
+			options:     controller.ProvisionOptions{Parameters: map[string]string{"gid": "foo"}},
 			expectedGid: "",
 			expectError: true,
 		},
 		{
 			name:        "bad gid parameter value zero",
-			options:     controller.VolumeOptions{Parameters: map[string]string{"gid": "0"}},
+			options:     controller.ProvisionOptions{Parameters: map[string]string{"gid": "0"}},
 			expectedGid: "",
 			expectError: true,
 		},
 		{
 			name:        "bad gid parameter value negative",
-			options:     controller.VolumeOptions{Parameters: map[string]string{"gid": "-1"}},
+			options:     controller.ProvisionOptions{Parameters: map[string]string{"gid": "-1"}},
 			expectedGid: "",
 			expectError: true,
 		},
 		{
 			name: "root squash parameter value 'true'",
-			options: controller.VolumeOptions{
+			options: controller.ProvisionOptions{
 				Parameters: map[string]string{"rootSquash": "true"},
 				PVC:        newClaim(resource.MustParse("1Ki"), nil, nil),
 			},
@@ -297,7 +297,7 @@ func TestValidateOptions(t *testing.T) {
 		},
 		{
 			name: "root squash parameter value 'false'",
-			options: controller.VolumeOptions{
+			options: controller.ProvisionOptions{
 				Parameters: map[string]string{"rootSquash": "false"},
 				PVC:        newClaim(resource.MustParse("1Ki"), nil, nil),
 			},
@@ -307,7 +307,7 @@ func TestValidateOptions(t *testing.T) {
 		},
 		{
 			name: "bad root squash parameter value neither 'true' nor 'false'",
-			options: controller.VolumeOptions{
+			options: controller.ProvisionOptions{
 				Parameters: map[string]string{"rootSquash": "asdf"},
 				PVC:        newClaim(resource.MustParse("1Ki"), nil, nil),
 			},
@@ -317,7 +317,7 @@ func TestValidateOptions(t *testing.T) {
 		// TODO implement options.ProvisionerSelector parsing
 		{
 			name: "mount options parameter key",
-			options: controller.VolumeOptions{
+			options: controller.ProvisionOptions{
 				Parameters: map[string]string{"mountOptions": "asdf"},
 				PVC:        newClaim(resource.MustParse("1Ki"), nil, nil),
 			},
@@ -327,7 +327,7 @@ func TestValidateOptions(t *testing.T) {
 		// TODO implement options.ProvisionerSelector parsing
 		{
 			name: "non-nil selector",
-			options: controller.VolumeOptions{
+			options: controller.ProvisionOptions{
 				PVC: newClaim(resource.MustParse("1Ki"), nil, &metav1.LabelSelector{MatchLabels: nil}),
 			},
 			expectedGid: "",
@@ -335,7 +335,7 @@ func TestValidateOptions(t *testing.T) {
 		},
 		{
 			name: "bad capacity",
-			options: controller.VolumeOptions{
+			options: controller.ProvisionOptions{
 				PVC: newClaim(resource.MustParse("1Ei"), nil, nil),
 			},
 			expectedGid: "",
