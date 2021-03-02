@@ -17,9 +17,9 @@ limitations under the License.
 package volume
 
 import (
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 
-	crdv1 "github.com/libopenstorage/external-storage/snapshot/pkg/apis/crd/v1"
+	crdv1 "github.com/kubernetes-incubator/external-storage/snapshot/pkg/apis/crd/v1"
 )
 
 // Plugin defines functions that should be implemented by the volume plugin

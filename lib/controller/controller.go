@@ -29,8 +29,8 @@ import (
 	"time"
 
 	"github.com/golang/glog"
-	"github.com/libopenstorage/external-storage/lib/controller/metrics"
-	"github.com/libopenstorage/external-storage/lib/util"
+	"github.com/kubernetes-incubator/external-storage/lib/controller/metrics"
+	"github.com/kubernetes-incubator/external-storage/lib/util"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/time/rate"

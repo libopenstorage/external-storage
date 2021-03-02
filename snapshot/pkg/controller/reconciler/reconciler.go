@@ -25,8 +25,8 @@ import (
 	"github.com/golang/glog"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/libopenstorage/external-storage/snapshot/pkg/controller/cache"
-	"github.com/libopenstorage/external-storage/snapshot/pkg/controller/snapshotter"
+	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/controller/cache"
+	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/controller/snapshotter"
 )
 
 // Reconciler runs a periodic loop to reconcile the desired state of the with

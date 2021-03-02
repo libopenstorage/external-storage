@@ -29,9 +29,9 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/libopenstorage/external-storage/snapshot/pkg/client"
-	snapshotcontroller "github.com/libopenstorage/external-storage/snapshot/pkg/controller/snapshot-controller"
-	"github.com/libopenstorage/external-storage/snapshot/pkg/volume"
+	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/client"
+	snapshotcontroller "github.com/kubernetes-incubator/external-storage/snapshot/pkg/controller/snapshot-controller"
+	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/volume"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 )
 

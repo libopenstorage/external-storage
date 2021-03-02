@@ -25,11 +25,11 @@ import (
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	crdv1 "github.com/libopenstorage/external-storage/snapshot/pkg/apis/crd/v1"
-	"github.com/libopenstorage/external-storage/snapshot/pkg/controller/cache"
-	"github.com/libopenstorage/external-storage/snapshot/pkg/controller/reconciler"
-	"github.com/libopenstorage/external-storage/snapshot/pkg/controller/snapshotter"
-	"github.com/libopenstorage/external-storage/snapshot/pkg/volume"
+	crdv1 "github.com/kubernetes-incubator/external-storage/snapshot/pkg/apis/crd/v1"
+	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/controller/cache"
+	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/controller/reconciler"
+	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/controller/snapshotter"
+	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/volume"
 	apiv1 "k8s.io/api/core/v1"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/kubernetes"
@@ -38,7 +38,7 @@ import (
 	kcache "k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/record"
 
-	"github.com/libopenstorage/external-storage/snapshot/pkg/controller/populator"
+	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/controller/populator"
 )
 
 const (
