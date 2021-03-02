@@ -21,8 +21,8 @@ import (
 	"os/exec"
 
 	"github.com/golang/glog"
-	crdv1 "github.com/kubernetes-incubator/external-storage/snapshot/pkg/apis/crd/v1"
-	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/volume"
+	crdv1 "github.com/libopenstorage/external-storage/snapshot/pkg/apis/crd/v1"
+	"github.com/libopenstorage/external-storage/snapshot/pkg/volume"
 	"github.com/pborman/uuid"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

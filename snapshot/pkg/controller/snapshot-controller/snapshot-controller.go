@@ -31,13 +31,13 @@ import (
 	"k8s.io/client-go/tools/record"
 	kcontroller "k8s.io/kubernetes/pkg/controller"
 
-	crdv1 "github.com/kubernetes-incubator/external-storage/snapshot/pkg/apis/crd/v1"
-	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/controller/cache"
-	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/controller/reconciler"
-	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/controller/snapshotter"
-	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/volume"
+	crdv1 "github.com/libopenstorage/external-storage/snapshot/pkg/apis/crd/v1"
+	"github.com/libopenstorage/external-storage/snapshot/pkg/controller/cache"
+	"github.com/libopenstorage/external-storage/snapshot/pkg/controller/reconciler"
+	"github.com/libopenstorage/external-storage/snapshot/pkg/controller/snapshotter"
+	"github.com/libopenstorage/external-storage/snapshot/pkg/volume"
 
-	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/controller/populator"
+	"github.com/libopenstorage/external-storage/snapshot/pkg/controller/populator"
 )
 
 const (

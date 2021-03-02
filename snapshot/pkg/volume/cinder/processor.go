@@ -26,9 +26,9 @@ import (
 
 	"github.com/golang/glog"
 
-	crdv1 "github.com/kubernetes-incubator/external-storage/snapshot/pkg/apis/crd/v1"
-	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/cloudprovider/providers/openstack"
-	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/volume"
+	crdv1 "github.com/libopenstorage/external-storage/snapshot/pkg/apis/crd/v1"
+	"github.com/libopenstorage/external-storage/snapshot/pkg/cloudprovider/providers/openstack"
+	"github.com/libopenstorage/external-storage/snapshot/pkg/volume"
 	k8sVol "k8s.io/kubernetes/pkg/volume/util"
 )
 

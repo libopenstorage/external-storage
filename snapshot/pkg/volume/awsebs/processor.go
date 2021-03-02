@@ -27,9 +27,9 @@ import (
 
 	"github.com/golang/glog"
 
-	crdv1 "github.com/kubernetes-incubator/external-storage/snapshot/pkg/apis/crd/v1"
-	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/cloudprovider/providers/aws"
-	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/volume"
+	crdv1 "github.com/libopenstorage/external-storage/snapshot/pkg/apis/crd/v1"
+	"github.com/libopenstorage/external-storage/snapshot/pkg/cloudprovider/providers/aws"
+	"github.com/libopenstorage/external-storage/snapshot/pkg/volume"
 )
 
 type awsEBSPlugin struct {

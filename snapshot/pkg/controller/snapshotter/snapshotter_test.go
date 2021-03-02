@@ -32,10 +32,10 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/rest"
 
-	crdv1 "github.com/kubernetes-incubator/external-storage/snapshot/pkg/apis/crd/v1"
-	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/cloudprovider"
-	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/controller/cache"
-	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/volume"
+	crdv1 "github.com/libopenstorage/external-storage/snapshot/pkg/apis/crd/v1"
+	"github.com/libopenstorage/external-storage/snapshot/pkg/cloudprovider"
+	"github.com/libopenstorage/external-storage/snapshot/pkg/controller/cache"
+	"github.com/libopenstorage/external-storage/snapshot/pkg/volume"
 )
 
 // TestPlugin methods
