@@ -29,8 +29,8 @@ import (
 	"time"
 
 	"github.com/golang/glog"
-	"github.com/kubernetes-incubator/external-storage/lib/controller/metrics"
-	"github.com/kubernetes-incubator/external-storage/lib/util"
+	"github.com/libopenstorage/external-storage/lib/controller/metrics"
+	"github.com/libopenstorage/external-storage/lib/util"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/time/rate"
@@ -53,7 +53,7 @@ import (
 	ref "k8s.io/client-go/tools/reference"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/kubernetes/pkg/apis/core/v1/helper"
-	utilversion "k8s.io/kubernetes/pkg/util/version"
+	utilversion "k8s.io/apimachinery/pkg/util/version"
 )
 
 // annClass annotation represents the storage class associated with a resource:
