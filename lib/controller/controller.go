@@ -34,7 +34,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/time/rate"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	storage "k8s.io/api/storage/v1"
 	storagebeta "k8s.io/api/storage/v1beta1"
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
@@ -628,6 +628,7 @@ func (ctrl *ProvisionController) Run(_ <-chan struct{}) {
 			ctrl.leaderElectionNamespace,
 			strings.Replace(ctrl.provisionerName, "/", "-", -1),
 			ctrl.client.CoreV1(),
+			ctrl.client.CoordinationV1(),
 			resourcelock.ResourceLockConfig{
 				Identity:      ctrl.id,
 				EventRecorder: ctrl.eventRecorder,

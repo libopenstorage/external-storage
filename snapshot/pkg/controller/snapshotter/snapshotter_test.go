@@ -26,7 +26,7 @@ import (
 	"net/http"
 	"testing"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
@@ -256,7 +256,7 @@ func fakeSchemeAndClient(roundTripper func(*http.Request) (*http.Response, error
 		ContentConfig: rest.ContentConfig{
 			GroupVersion:         &crdv1.SchemeGroupVersion,
 			ContentType:          runtime.ContentTypeJSON,
-			NegotiatedSerializer: serializer.DirectCodecFactory{CodecFactory: serializer.NewCodecFactory(scheme)},
+			NegotiatedSerializer: serializer.WithoutConversionCodecFactory{CodecFactory: serializer.NewCodecFactory(scheme)},
 		},
 		Transport: roundTripperFunc(roundTripper),
 	}

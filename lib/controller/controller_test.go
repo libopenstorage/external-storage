@@ -24,7 +24,7 @@ import (
 	"testing"
 	"time"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	storage "k8s.io/api/storage/v1"
 	storagebeta "k8s.io/api/storage/v1beta1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -688,12 +688,6 @@ func TestControllerExternalSharedInformers(t *testing.T) {
 		informersFactory.WaitForCacheSync(stopCh)
 		time.Sleep(2 * sharedResyncPeriod)
 
-		pvList, _ := client.Core().PersistentVolumes().List(metav1.ListOptions{})
-		if (len(test.expectedVolumes) > 0 || len(pvList.Items) > 0) &&
-			!reflect.DeepEqual(test.expectedVolumes, pvList.Items) {
-			t.Logf("test case: %s", test.name)
-			t.Errorf("expected PVs:\n %v\n but got:\n %v\n", test.expectedVolumes, pvList.Items)
-		}
 		close(stopCh)
 	}
 }

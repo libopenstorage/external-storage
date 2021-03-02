@@ -30,17 +30,8 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/libopenstorage/external-storage/snapshot/pkg/client"
-	"github.com/libopenstorage/external-storage/snapshot/pkg/cloudprovider"
-	"github.com/libopenstorage/external-storage/snapshot/pkg/cloudprovider/providers/aws"
-	"github.com/libopenstorage/external-storage/snapshot/pkg/cloudprovider/providers/gce"
-	"github.com/libopenstorage/external-storage/snapshot/pkg/cloudprovider/providers/openstack"
 	snapshotcontroller "github.com/libopenstorage/external-storage/snapshot/pkg/controller/snapshot-controller"
 	"github.com/libopenstorage/external-storage/snapshot/pkg/volume"
-	"github.com/libopenstorage/external-storage/snapshot/pkg/volume/awsebs"
-	"github.com/libopenstorage/external-storage/snapshot/pkg/volume/cinder"
-	"github.com/libopenstorage/external-storage/snapshot/pkg/volume/gcepd"
-	"github.com/libopenstorage/external-storage/snapshot/pkg/volume/gluster"
-	"github.com/libopenstorage/external-storage/snapshot/pkg/volume/hostpath"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 )
 
@@ -87,8 +78,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	// build volume plugins map
-	buildVolumePlugins()
 
 	// start controller on instances of our CRD
 	glog.Infof("starting snapshot controller")
@@ -109,34 +98,4 @@ func buildConfig(kubeconfig string) (*rest.Config, error) {
 		return clientcmd.BuildConfigFromFlags("", kubeconfig)
 	}
 	return rest.InClusterConfig()
-}
-
-func buildVolumePlugins() {
-	if len(*cloudProvider) != 0 {
-		cloud, err := cloudprovider.InitCloudProvider(*cloudProvider, *cloudConfigFile)
-		if err == nil && cloud != nil {
-			if *cloudProvider == aws.ProviderName {
-				awsPlugin := awsebs.RegisterPlugin()
-				awsPlugin.Init(cloud)
-				volumePlugins[awsebs.GetPluginName()] = awsPlugin
-				glog.Info("Register cloudprovider aws")
-			}
-			if *cloudProvider == gce.ProviderName {
-				gcePlugin := gcepd.RegisterPlugin()
-				gcePlugin.Init(cloud)
-				volumePlugins[gcepd.GetPluginName()] = gcePlugin
-				glog.Infof("Register cloudprovider %s", gcepd.GetPluginName())
-			}
-			if *cloudProvider == openstack.ProviderName {
-				cinderPlugin := cinder.RegisterPlugin()
-				cinderPlugin.Init(cloud)
-				volumePlugins[cinder.GetPluginName()] = cinderPlugin
-				glog.Infof("Register cloudprovider %s", cinder.GetPluginName())
-			}
-		} else {
-			glog.Warningf("failed to initialize cloudprovider: %v, supported cloudproviders are %#v", err, cloudprovider.CloudProviders())
-		}
-	}
-	volumePlugins[gluster.GetPluginName()] = gluster.RegisterPlugin()
-	volumePlugins[hostpath.GetPluginName()] = hostpath.RegisterPlugin()
 }
