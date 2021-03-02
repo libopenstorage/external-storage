@@ -17,6 +17,7 @@ limitations under the License.
 package controller
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"reflect"
@@ -31,6 +32,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	utilversion "k8s.io/apimachinery/pkg/util/version"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/fake"
@@ -38,7 +40,6 @@ import (
 	testclient "k8s.io/client-go/testing"
 	"k8s.io/client-go/tools/cache"
 	ref "k8s.io/client-go/tools/reference"
-	utilversion "k8s.io/apimachinery/pkg/util/version"
 )
 
 const (
@@ -224,7 +225,7 @@ func TestController(t *testing.T) {
 
 		time.Sleep(2 * resyncPeriod)
 
-		pvList, _ := client.CoreV1().PersistentVolumes().List(metav1.ListOptions{})
+		pvList, _ := client.CoreV1().PersistentVolumes().List(context.TODO(), metav1.ListOptions{})
 		if !reflect.DeepEqual(test.expectedVolumes, pvList.Items) {
 			t.Logf("test case: %s", test.name)
 			t.Errorf("expected PVs:\n %v\n but got:\n %v\n", test.expectedVolumes, pvList.Items)
@@ -904,8 +905,8 @@ func constructProvisionedVolumeWithoutStorageClassInfo(claim *v1.PersistentVolum
 	// pv.Spec MUST be set to match requirements in claim.Spec, especially access mode and PV size. The provisioned volume size MUST NOT be smaller than size requested in the claim, however it MAY be larger.
 	options := VolumeOptions{
 		PersistentVolumeReclaimPolicy: reclaimPolicy,
-		PVName: "pvc-" + string(claim.ObjectMeta.UID),
-		PVC:    claim,
+		PVName:                        "pvc-" + string(claim.ObjectMeta.UID),
+		PVC:                           claim,
 	}
 	volume, _ := newTestProvisioner().Provision(options)
 

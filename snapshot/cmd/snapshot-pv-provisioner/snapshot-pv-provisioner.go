@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
@@ -107,7 +108,7 @@ func (p *snapshotProvisioner) Provision(options controller.VolumeOptions) (*v1.P
 		Resource(crdv1.VolumeSnapshotResourcePlural).
 		Namespace(options.PVC.Namespace).
 		Name(snapshotName).
-		Do().Into(&snapshot)
+		Do(context.TODO()).Into(&snapshot)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve VolumeSnapshot %s: %v", snapshotName, err)
@@ -120,7 +121,7 @@ func (p *snapshotProvisioner) Provision(options controller.VolumeOptions) (*v1.P
 	err = p.crdclient.Get().
 		Resource(crdv1.VolumeSnapshotDataResourcePlural).
 		Name(snapshot.Spec.SnapshotDataName).
-		Do().Into(&snapshotData)
+		Do(context.TODO()).Into(&snapshotData)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve VolumeSnapshotData %s: %v", snapshot.Spec.SnapshotDataName, err)

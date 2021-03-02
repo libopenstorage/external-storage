@@ -18,6 +18,7 @@ package snapshotter
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -379,7 +380,7 @@ func Test_deleteSnapshot(t *testing.T) {
 	// create fake PV
 	pv := fakePV()
 	pv.Name = snapDataList.Items[0].Spec.PersistentVolumeRef.Name
-	vs.coreClient.CoreV1().PersistentVolumes().Create(pv)
+	vs.coreClient.CoreV1().PersistentVolumes().Create(context.TODO(), pv, metav1.CreateOptions{})
 	err = vs.deleteSnapshot(&snapDataList.Items[0].Spec)
 	if err != nil {
 		t.Errorf("Test failed, unexpected error: %v", err)
