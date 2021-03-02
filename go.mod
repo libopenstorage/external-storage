@@ -3,31 +3,31 @@ module github.com/libopenstorage/external-storage
 go 1.15
 
 require (
-	cloud.google.com/go v0.54.0
-	github.com/aws/aws-sdk-go v1.35.24
+	cloud.google.com/go v0.54.0 // indirect
+	github.com/aws/aws-sdk-go v1.35.24 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/google/uuid v1.2.0 // indirect
-	github.com/gophercloud/gophercloud v0.1.0
+	github.com/gophercloud/gophercloud v0.1.0 // indirect
 	github.com/imdario/mergo v0.3.6 // indirect
-	github.com/mitchellh/mapstructure v1.1.2
+	github.com/mitchellh/mapstructure v1.1.2 // indirect
 	github.com/onsi/ginkgo v1.15.0 // indirect
 	github.com/onsi/gomega v1.10.5 // indirect
-	github.com/pborman/uuid v1.2.0
+	github.com/pborman/uuid v1.2.0 // indirect
 	github.com/prometheus/client_golang v1.7.1
-	github.com/stretchr/testify v1.6.1
-	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
+	github.com/stretchr/testify v1.6.1 // indirect
+	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e
-	google.golang.org/api v0.20.0
+	google.golang.org/api v0.20.0 // indirect
 	google.golang.org/grpc v1.33.1 // indirect
-	gopkg.in/gcfg.v1 v1.2.3
+	gopkg.in/gcfg.v1 v1.2.3 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	k8s.io/api v0.20.4
 	k8s.io/apiextensions-apiserver v0.0.0
 	k8s.io/apimachinery v0.20.4
 	k8s.io/client-go v0.20.4
 	k8s.io/kubernetes v0.0.0-00010101000000-000000000000
-	k8s.io/mount-utils v0.20.4
-	k8s.io/utils v0.0.0-20201110183641-67b214c5f920
+	k8s.io/mount-utils v0.20.4 // indirect
+	k8s.io/utils v0.0.0-20201110183641-67b214c5f920 // indirect
 )
 
 replace (
