@@ -264,10 +264,13 @@ func IsIntegerResourceName(str string) bool {
 	return integerResources.Has(str) || IsExtendedResourceName(core.ResourceName(str))
 }
 
-// this function aims to check if the service's ClusterIP is set or not
+// IsServiceIPSet aims to check if the service's ClusterIP is set or not
 // the objective is not to perform validation here
 func IsServiceIPSet(service *core.Service) bool {
-	return service.Spec.ClusterIP != core.ClusterIPNone && service.Spec.ClusterIP != ""
+	// This function assumes that the service is semantically validated
+	// it does not test if the IP is valid, just makes sure that it is set.
+	return len(service.Spec.ClusterIP) > 0 &&
+		service.Spec.ClusterIP != core.ClusterIPNone
 }
 
 var standardFinalizers = sets.NewString(
@@ -276,52 +279,9 @@ var standardFinalizers = sets.NewString(
 	metav1.FinalizerDeleteDependents,
 )
 
+// IsStandardFinalizerName checks if the input string is a standard finalizer name
 func IsStandardFinalizerName(str string) bool {
 	return standardFinalizers.Has(str)
-}
-
-// AddToNodeAddresses appends the NodeAddresses to the passed-by-pointer slice,
-// only if they do not already exist
-func AddToNodeAddresses(addresses *[]core.NodeAddress, addAddresses ...core.NodeAddress) {
-	for _, add := range addAddresses {
-		exists := false
-		for _, existing := range *addresses {
-			if existing.Address == add.Address && existing.Type == add.Type {
-				exists = true
-				break
-			}
-		}
-		if !exists {
-			*addresses = append(*addresses, add)
-		}
-	}
-}
-
-// TODO: make method on LoadBalancerStatus?
-func LoadBalancerStatusEqual(l, r *core.LoadBalancerStatus) bool {
-	return ingressSliceEqual(l.Ingress, r.Ingress)
-}
-
-func ingressSliceEqual(lhs, rhs []core.LoadBalancerIngress) bool {
-	if len(lhs) != len(rhs) {
-		return false
-	}
-	for i := range lhs {
-		if !ingressEqual(&lhs[i], &rhs[i]) {
-			return false
-		}
-	}
-	return true
-}
-
-func ingressEqual(lhs, rhs *core.LoadBalancerIngress) bool {
-	if lhs.IP != rhs.IP {
-		return false
-	}
-	if lhs.Hostname != rhs.Hostname {
-		return false
-	}
-	return true
 }
 
 // GetAccessModesAsString returns a string representation of an array of access modes.
@@ -341,7 +301,7 @@ func GetAccessModesAsString(modes []core.PersistentVolumeAccessMode) string {
 	return strings.Join(modesStr, ",")
 }
 
-// GetAccessModesAsString returns an array of AccessModes from a string created by GetAccessModesAsString
+// GetAccessModesFromString returns an array of AccessModes from a string created by GetAccessModesAsString
 func GetAccessModesFromString(modes string) []core.PersistentVolumeAccessMode {
 	strmodes := strings.Split(modes, ",")
 	accessModes := []core.PersistentVolumeAccessMode{}
@@ -538,27 +498,37 @@ func PersistentVolumeClaimHasClass(claim *core.PersistentVolumeClaim) bool {
 	return false
 }
 
-// ScopedResourceSelectorRequirementsAsSelector converts the ScopedResourceSelectorRequirement api type into a struct that implements
-// labels.Selector.
-func ScopedResourceSelectorRequirementsAsSelector(ssr core.ScopedResourceSelectorRequirement) (labels.Selector, error) {
-	selector := labels.NewSelector()
-	var op selection.Operator
-	switch ssr.Operator {
-	case core.ScopeSelectorOpIn:
-		op = selection.In
-	case core.ScopeSelectorOpNotIn:
-		op = selection.NotIn
-	case core.ScopeSelectorOpExists:
-		op = selection.Exists
-	case core.ScopeSelectorOpDoesNotExist:
-		op = selection.DoesNotExist
-	default:
-		return nil, fmt.Errorf("%q is not a valid scope selector operator", ssr.Operator)
+func toResourceNames(resources core.ResourceList) []core.ResourceName {
+	result := []core.ResourceName{}
+	for resourceName := range resources {
+		result = append(result, resourceName)
 	}
-	r, err := labels.NewRequirement(string(ssr.ScopeName), op, ssr.Values)
-	if err != nil {
-		return nil, err
+	return result
+}
+
+func toSet(resourceNames []core.ResourceName) sets.String {
+	result := sets.NewString()
+	for _, resourceName := range resourceNames {
+		result.Insert(string(resourceName))
 	}
-	selector = selector.Add(*r)
-	return selector, nil
+	return result
+}
+
+// toContainerResourcesSet returns a set of resources names in container resource requirements
+func toContainerResourcesSet(ctr *core.Container) sets.String {
+	resourceNames := toResourceNames(ctr.Resources.Requests)
+	resourceNames = append(resourceNames, toResourceNames(ctr.Resources.Limits)...)
+	return toSet(resourceNames)
+}
+
+// ToPodResourcesSet returns a set of resource names in all containers in a pod.
+func ToPodResourcesSet(podSpec *core.PodSpec) sets.String {
+	result := sets.NewString()
+	for i := range podSpec.InitContainers {
+		result = result.Union(toContainerResourcesSet(&podSpec.InitContainers[i]))
+	}
+	for i := range podSpec.Containers {
+		result = result.Union(toContainerResourcesSet(&podSpec.Containers[i]))
+	}
+	return result
 }

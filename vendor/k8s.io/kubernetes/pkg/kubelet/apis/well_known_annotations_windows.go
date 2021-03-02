@@ -20,18 +20,23 @@ package apis
 
 import (
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	"k8s.io/klog/v2"
 	"k8s.io/kubernetes/pkg/features"
 )
 
 const (
-	// HypervIsolationAnnotationKey and HypervIsolationValue are used to run windows containers with hyperv isolation.
+	// HypervIsolationAnnotationKey is used to run windows containers with hyperv isolation.
 	// Refer https://aka.ms/hyperv-container.
 	HypervIsolationAnnotationKey = "experimental.windows.kubernetes.io/isolation-type"
-	HypervIsolationValue         = "hyperv"
+	// HypervIsolationValue is used to run windows containers with hyperv isolation.
+	// Refer https://aka.ms/hyperv-container.
+	HypervIsolationValue = "hyperv"
 )
 
 // ShouldIsolatedByHyperV returns true if a windows container should be run with hyperv isolation.
 func ShouldIsolatedByHyperV(annotations map[string]string) bool {
+	klog.Warningf("The hyper-v FeatureGate is deprecated in 1.20 and will be removed in 1.21")
+
 	if !utilfeature.DefaultFeatureGate.Enabled(features.HyperVContainer) {
 		return false
 	}
