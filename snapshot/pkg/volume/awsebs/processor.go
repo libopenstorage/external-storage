@@ -132,7 +132,8 @@ func (a *awsEBSPlugin) SnapshotRestore(snapshotData *crdv1.VolumeSnapshotData, p
 
 	capacity := pvc.Spec.Resources.Requests[v1.ResourceName(v1.ResourceStorage)]
 	// AWS works with gigabytes, convert to GiB with rounding up
-	requestGB := int(helpers.RoundUpToGB(capacity))
+	gib,_ := helpers.RoundUpToGiB(capacity)
+	requestGB := int(gib)
 	volumeOptions := &aws.VolumeOptions{
 		CapacityGB: requestGB,
 		Tags:       tags,

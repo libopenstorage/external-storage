@@ -35,13 +35,12 @@ import (
 	"github.com/gophercloud/gophercloud/pagination"
 	"github.com/mitchellh/mapstructure"
 	"gopkg.in/gcfg.v1"
-
+	"k8s.io/controller-manager/pkg/clientbuilder"
 	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/cloudprovider"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	netutil "k8s.io/apimachinery/pkg/util/net"
 	certutil "k8s.io/client-go/util/cert"
-	"k8s.io/kubernetes/pkg/controller"
 )
 
 // ProviderName is the name of the cloud provider
@@ -299,7 +298,7 @@ func (os *OpenStack) ScrubDNS(nameServers, searches []string) ([]string, []strin
 }
 
 // Initialize passes a Kubernetes clientBuilder interface to the cloud provider
-func (os *OpenStack) Initialize(clientBuilder controller.ControllerClientBuilder) {}
+func (os *OpenStack) Initialize(clientBuilder clientbuilder.ControllerClientBuilder) {}
 
 // mapNodeNameToServerName maps a k8s NodeName to an OpenStack Server Name
 // This is a simple string cast.

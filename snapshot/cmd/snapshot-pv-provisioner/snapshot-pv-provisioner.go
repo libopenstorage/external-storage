@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
@@ -34,14 +35,13 @@ import (
 	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/volume/gcepd"
 	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/volume/gluster"
 	"github.com/kubernetes-incubator/external-storage/snapshot/pkg/volume/hostpath"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/controller"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/controller"
 )
 
 const (
@@ -93,13 +93,13 @@ func (p *snapshotProvisioner) snapshotRestore(snapshotName string, snapshotData 
 }
 
 // Provision creates a storage asset and returns a PV object representing it.
-func (p *snapshotProvisioner) Provision(options controller.ProvisionOptions) (*v1.PersistentVolume, error) {
+func (p *snapshotProvisioner) Provision(ctx context.Context, options controller.ProvisionOptions) (*v1.PersistentVolume, controller.ProvisioningState, error) {
 	if options.PVC.Spec.Selector != nil {
-		return nil, fmt.Errorf("claim Selector is not supported")
+		return nil, controller.ProvisioningNoChange, fmt.Errorf("claim Selector is not supported")
 	}
 	snapshotName, ok := options.PVC.Annotations[crdclient.SnapshotPVCAnnotation]
 	if !ok {
-		return nil, fmt.Errorf("snapshot annotation not found on PV")
+		return nil, controller.ProvisioningNoChange, fmt.Errorf("snapshot annotation not found on PV")
 	}
 
 	var snapshot crdv1.VolumeSnapshot
@@ -107,29 +107,29 @@ func (p *snapshotProvisioner) Provision(options controller.ProvisionOptions) (*v
 		Resource(crdv1.VolumeSnapshotResourcePlural).
 		Namespace(options.PVC.Namespace).
 		Name(snapshotName).
-		Do().Into(&snapshot)
+		Do(context.TODO()).Into(&snapshot)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve VolumeSnapshot %s: %v", snapshotName, err)
+		return nil, controller.ProvisioningNoChange, fmt.Errorf("failed to retrieve VolumeSnapshot %s: %v", snapshotName, err)
 	}
 	// FIXME: should also check if any VolumeSnapshotData points to this VolumeSnapshot
 	if len(snapshot.Spec.SnapshotDataName) == 0 {
-		return nil, fmt.Errorf("VolumeSnapshot %s is not bound to any VolumeSnapshotData", snapshotName)
+		return nil, controller.ProvisioningNoChange, fmt.Errorf("VolumeSnapshot %s is not bound to any VolumeSnapshotData", snapshotName)
 	}
 	var snapshotData crdv1.VolumeSnapshotData
 	err = p.crdclient.Get().
 		Resource(crdv1.VolumeSnapshotDataResourcePlural).
 		Name(snapshot.Spec.SnapshotDataName).
-		Do().Into(&snapshotData)
+		Do(context.TODO()).Into(&snapshotData)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve VolumeSnapshotData %s: %v", snapshot.Spec.SnapshotDataName, err)
+		return nil, controller.ProvisioningNoChange, fmt.Errorf("failed to retrieve VolumeSnapshotData %s: %v", snapshot.Spec.SnapshotDataName, err)
 	}
 	glog.V(3).Infof("restore from VolumeSnapshotData %s", snapshot.Spec.SnapshotDataName)
 
 	pvSrc, labels, err := p.snapshotRestore(snapshot.Spec.SnapshotDataName, snapshotData, options)
 	if err != nil || pvSrc == nil {
-		return nil, fmt.Errorf("failed to create a PV from snapshot %s: %v", snapshotName, err)
+		return nil, controller.ProvisioningNoChange, fmt.Errorf("failed to create a PV from snapshot %s: %v", snapshotName, err)
 	}
 	pv := &v1.PersistentVolume{
 		ObjectMeta: metav1.ObjectMeta{
@@ -159,12 +159,12 @@ func (p *snapshotProvisioner) Provision(options controller.ProvisionOptions) (*v
 
 	glog.Infof("successfully created Snapshot share %#v", pv)
 
-	return pv, nil
+	return pv, controller.ProvisioningFinished, nil
 }
 
 // Delete removes the storage asset that was created by Provision represented
 // by the given PV.
-func (p *snapshotProvisioner) Delete(volume *v1.PersistentVolume) error {
+func (p *snapshotProvisioner) Delete(ctx context.Context, volume *v1.PersistentVolume) error {
 	ann, ok := volume.Annotations[provisionerIDAnn]
 	if !ok {
 		return errors.New("identity annotation not found on PV")
@@ -250,7 +250,7 @@ func main() {
 		serverVersion.GitVersion,
 	)
 	glog.Infof("starting PV provisioner %s", provisionerName)
-	pc.Run(wait.NeverStop)
+	pc.Run(context.Background())
 }
 
 func buildVolumePlugins() error {
