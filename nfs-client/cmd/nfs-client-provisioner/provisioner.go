@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
@@ -138,7 +139,7 @@ func (p *nfsProvisioner) getClassForVolume(pv *v1.PersistentVolume) (*storage.St
 	if className == "" {
 		return nil, fmt.Errorf("Volume has no storage class")
 	}
-	class, err := p.client.StorageV1().StorageClasses().Get(className, metav1.GetOptions{})
+	class, err := p.client.StorageV1().StorageClasses().Get(context.TODO(), className, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}

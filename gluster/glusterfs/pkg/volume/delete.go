@@ -17,7 +17,9 @@ limitations under the License.
 package volume
 
 import (
+	"context"
 	"fmt"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"path/filepath"
 	"strings"
 
@@ -122,7 +124,7 @@ func (p *glusterfsProvisioner) deleteEndpointService(namespace string, epService
 	if kubeClient == nil {
 		return fmt.Errorf("glusterfs: failed to get kube client when deleting endpoint service")
 	}
-	err = kubeClient.CoreV1().Services(namespace).Delete(epServiceName, nil)
+	err = kubeClient.CoreV1().Services(namespace).Delete(context.TODO(), epServiceName, metav1.DeleteOptions{})
 	if err != nil {
 		klog.Errorf("glusterfs: error deleting service %s/%s: %v", namespace, epServiceName, err)
 	}

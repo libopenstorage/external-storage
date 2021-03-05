@@ -23,8 +23,8 @@ import (
 	"strings"
 	"time"
 
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/controller"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/util"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/controller"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/util"
 	"k8s.io/api/core/v1"
 	"k8s.io/klog"
 )

@@ -28,8 +28,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/klog"
 	"k8s.io/kubernetes/pkg/kubelet/apis"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/controller"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/util"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/controller"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/util"
 )
 
 const (

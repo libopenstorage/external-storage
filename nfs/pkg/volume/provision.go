@@ -17,6 +17,7 @@ limitations under the License.
 package volume
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -34,7 +35,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/uuid"
 	"k8s.io/client-go/kubernetes"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/controller"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/controller"
 )
 
 const (
@@ -392,7 +393,7 @@ func (p *nfsProvisioner) getServer() (string, error) {
 	if namespace == "" {
 		return "", fmt.Errorf("service env %s is set but namespace env %s isn't; no way to get the service cluster IP", p.serviceEnv, p.namespaceEnv)
 	}
-	service, err := p.client.CoreV1().Services(namespace).Get(serviceName, metav1.GetOptions{})
+	service, err := p.client.CoreV1().Services(namespace).Get(context.TODO(), serviceName, metav1.GetOptions{})
 	if err != nil {
 		return "", fmt.Errorf("error getting service %s=%s in namespace %s=%s", p.serviceEnv, serviceName, p.namespaceEnv, namespace)
 	}
@@ -409,7 +410,7 @@ func (p *nfsProvisioner) getServer() (string, error) {
 		{111, v1.ProtocolUDP}:   true,
 		{111, v1.ProtocolTCP}:   true,
 	}
-	endpoints, err := p.client.CoreV1().Endpoints(namespace).Get(serviceName, metav1.GetOptions{})
+	endpoints, err := p.client.CoreV1().Endpoints(namespace).Get(context.TODO(), serviceName, metav1.GetOptions{})
 	for _, subset := range endpoints.Subsets {
 		// One service can't have multiple nfs-provisioner endpoints. If it had, kubernetes would round-robin
 		// the request which would probably go to the wrong instance.

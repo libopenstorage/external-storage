@@ -29,8 +29,8 @@ import (
 	"github.com/spf13/viper"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/controller"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/util"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/controller"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/util"
 )
 
 var log = logrus.New()

@@ -27,7 +27,7 @@ import (
 	"github.com/kubernetes-incubator/external-storage/local-volume/provisioner/pkg/common"
 	"github.com/kubernetes-incubator/external-storage/local-volume/provisioner/pkg/deleter"
 	"github.com/kubernetes-incubator/external-storage/local-volume/provisioner/pkg/util"
-	esUtil "sigs.k8s.io/sig-storage-lib-external-provisioner/util"
+	esUtil "sigs.k8s.io/sig-storage-lib-external-provisioner/v6/util"
 
 	"k8s.io/api/core/v1"
 	storagev1 "k8s.io/api/storage/v1"
@@ -36,7 +36,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes/fake"
-	"k8s.io/kubernetes/pkg/util/mount"
+	"k8s.io/mount-utils"
 )
 
 const (

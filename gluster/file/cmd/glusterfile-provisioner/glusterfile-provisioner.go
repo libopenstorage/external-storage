@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -37,9 +38,9 @@ import (
 	"k8s.io/client-go/util/retry"
 	"k8s.io/klog"
 	"k8s.io/kubernetes/pkg/volume"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/controller"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/gidallocator"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/util"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/controller"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/gidallocator"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/util"
 )
 
 const (
@@ -108,14 +109,14 @@ func (p *glusterfileProvisioner) GetAccessModes() []v1.PersistentVolumeAccessMod
 }
 
 func (p *glusterfileProvisioner) getPVC(ns string, name string) (*v1.PersistentVolumeClaim, error) {
-	return p.client.CoreV1().PersistentVolumeClaims(ns).Get(name, metav1.GetOptions{})
+	return p.client.CoreV1().PersistentVolumeClaims(ns).Get(context.TODO(), name, metav1.GetOptions{})
 }
 
 func (p *glusterfileProvisioner) annotatePVC(ns string, name string, updates map[string]string) error {
 	retryErr := retry.RetryOnConflict(retry.DefaultRetry, func() error {
 		// Retrieve the latest version of PVC before attempting update
 		// RetryOnConflict uses exponential backoff to avoid exhausting the apiserver
-		result, getErr := p.client.CoreV1().PersistentVolumeClaims(ns).Get(name, metav1.GetOptions{})
+		result, getErr := p.client.CoreV1().PersistentVolumeClaims(ns).Get(context.TODO(), name, metav1.GetOptions{})
 		if getErr != nil {
 			panic(fmt.Errorf("Failed to get latest version of PVC: %v", getErr))
 		}
@@ -123,7 +124,7 @@ func (p *glusterfileProvisioner) annotatePVC(ns string, name string, updates map
 		for k, v := range updates {
 			result.Annotations[k] = v
 		}
-		_, updateErr := p.client.CoreV1().PersistentVolumeClaims(ns).Update(result)
+		_, updateErr := p.client.CoreV1().PersistentVolumeClaims(ns).Update(context.TODO(), result, metav1.UpdateOptions{})
 		return updateErr
 	})
 	if retryErr != nil {
@@ -495,7 +496,7 @@ func (p *glusterfileProvisioner) createEndpointService(namespace string, epServi
 	if kubeClient == nil {
 		return nil, nil, fmt.Errorf("failed to get kube client when creating endpoint service")
 	}
-	_, err = kubeClient.CoreV1().Endpoints(namespace).Create(endpoint)
+	_, err = kubeClient.CoreV1().Endpoints(namespace).Create(context.TODO(), endpoint, metav1.CreateOptions{})
 	if err != nil && errors.IsAlreadyExists(err) {
 		klog.V(1).Infof("endpoint %s already exist in namespace %s", endpoint, namespace)
 		err = nil
@@ -515,7 +516,7 @@ func (p *glusterfileProvisioner) createEndpointService(namespace string, epServi
 		Spec: v1.ServiceSpec{
 			Ports: []v1.ServicePort{
 				{Protocol: "TCP", Port: 1}}}}
-	_, err = kubeClient.CoreV1().Services(namespace).Create(service)
+	_, err = kubeClient.CoreV1().Services(namespace).Create(context.TODO(), service, metav1.CreateOptions{})
 	if err != nil && errors.IsAlreadyExists(err) {
 		klog.V(1).Infof("service %s already exist in namespace %s", service, namespace)
 		err = nil
@@ -663,7 +664,7 @@ func (p *glusterfileProvisioner) deleteEndpointService(namespace string, epServi
 	if kubeClient == nil {
 		return fmt.Errorf("failed to get kube client when deleting endpoint service")
 	}
-	err = kubeClient.CoreV1().Services(namespace).Delete(epServiceName, nil)
+	err = kubeClient.CoreV1().Services(namespace).Delete(context.TODO(), epServiceName, metav1.DeleteOptions{})
 	if err != nil {
 		return fmt.Errorf("error deleting service %s/%s: %v", namespace, epServiceName, err)
 	}
@@ -698,7 +699,7 @@ func GetSecretForPV(restSecretNamespace, restSecretName, volumePluginName string
 	if kubeClient == nil {
 		return secret, fmt.Errorf("Cannot get kube client")
 	}
-	secrets, err := kubeClient.CoreV1().Secrets(restSecretNamespace).Get(restSecretName, metav1.GetOptions{})
+	secrets, err := kubeClient.CoreV1().Secrets(restSecretNamespace).Get(context.TODO(), restSecretName, metav1.GetOptions{})
 	if err != nil {
 		return secret, err
 	}

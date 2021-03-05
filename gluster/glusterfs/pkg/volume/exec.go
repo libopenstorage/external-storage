@@ -18,6 +18,7 @@ package volume
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 
 	"k8s.io/api/core/v1"
@@ -93,7 +94,7 @@ func (p *glusterfsProvisioner) selectPod(host string,
 
 	podList, err := p.client.CoreV1().
 		Pods(config.Namespace).
-		List(meta_v1.ListOptions{
+		List(context.TODO(), meta_v1.ListOptions{
 			LabelSelector: config.LabelSelector,
 		})
 	if err != nil {

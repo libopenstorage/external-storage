@@ -17,6 +17,7 @@ limitations under the License.
 package provision
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net"
@@ -30,8 +31,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/klog"
 	"k8s.io/kubernetes/pkg/volume"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/controller"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/util"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/controller"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/util"
 )
 
 const (
@@ -185,7 +186,7 @@ func (p *rbdProvisioner) Delete(volume *v1.PersistentVolume) error {
 		return &controller.IgnoredError{Reason: "identity annotation on PV does not match ours"}
 	}
 
-	class, err := p.client.StorageV1beta1().StorageClasses().Get(util.GetPersistentVolumeClass(volume), metav1.GetOptions{})
+	class, err := p.client.StorageV1beta1().StorageClasses().Get(context.TODO(), util.GetPersistentVolumeClass(volume), metav1.GetOptions{})
 	if err != nil {
 		return err
 	}
@@ -311,7 +312,7 @@ func (p *rbdProvisioner) parsePVSecret(namespace, secretName string) (string, er
 	if p.client == nil {
 		return "", fmt.Errorf("Cannot get kube client")
 	}
-	secrets, err := p.client.CoreV1().Secrets(namespace).Get(secretName, metav1.GetOptions{})
+	secrets, err := p.client.CoreV1().Secrets(namespace).Get(context.TODO(), secretName, metav1.GetOptions{})
 	if err != nil {
 		return "", err
 	}
