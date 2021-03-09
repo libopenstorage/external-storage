@@ -123,7 +123,7 @@ func (volumes *VolumesV2) getVolume(volumeID string) (Volume, error) {
 }
 
 func (volumes *VolumesV2) deleteVolume(volumeID string) error {
-	err := volumesV2.Delete(volumes.blockstorage, volumeID).ExtractErr()
+	err := volumesV2.Delete(volumes.blockstorage, volumeID, volumesV2.DeleteOpts{}).ExtractErr()
 	if err != nil {
 		glog.Errorf("Cannot delete volume %s: %v", volumeID, err)
 	}

@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"flag"
 	"log"
 	"math/rand"
@@ -110,7 +111,7 @@ func main() {
 }
 
 func getNode(client *kubernetes.Clientset, name string) *v1.Node {
-	node, err := client.CoreV1().Nodes().Get(name, metav1.GetOptions{})
+	node, err := client.CoreV1().Nodes().Get(context.TODO(), name, metav1.GetOptions{})
 	if err != nil {
 		glog.Fatalf("Could not get node information: %v", err)
 	}

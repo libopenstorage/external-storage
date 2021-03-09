@@ -17,6 +17,7 @@ limitations under the License.
 package volume
 
 import (
+	"context"
 	"fmt"
 	"path/filepath"
 	"strconv"
@@ -29,8 +30,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/klog"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/controller"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/gidallocator"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/controller"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/gidallocator"
 )
 
 const (
@@ -245,7 +246,7 @@ func (p *glusterfsProvisioner) createEndpointService(namespace string, epService
 	if kubeClient == nil {
 		return nil, nil, fmt.Errorf("glusterfs: failed to get kube client when creating endpoint service")
 	}
-	_, err = kubeClient.CoreV1().Endpoints(namespace).Create(endpoint)
+	_, err = kubeClient.CoreV1().Endpoints(namespace).Create(context.TODO(), endpoint, metav1.CreateOptions{})
 	if err != nil && errors.IsAlreadyExists(err) {
 		klog.V(1).Infof("glusterfs: endpoint [%s] already exist in namespace [%s]", endpoint, namespace)
 		err = nil
@@ -265,7 +266,7 @@ func (p *glusterfsProvisioner) createEndpointService(namespace string, epService
 		Spec: v1.ServiceSpec{
 			Ports: []v1.ServicePort{
 				{Protocol: "TCP", Port: 1}}}}
-	_, err = kubeClient.CoreV1().Services(namespace).Create(service)
+	_, err = kubeClient.CoreV1().Services(namespace).Create(context.TODO(), service, metav1.CreateOptions{})
 	if err != nil && errors.IsAlreadyExists(err) {
 		klog.V(1).Infof("glusterfs: service [%s] already exist in namespace [%s]", service, namespace)
 		err = nil

@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -36,8 +37,8 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/controller"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/util"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/controller"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/util"
 )
 
 const (
@@ -349,7 +350,7 @@ func (p *glusterBlockProvisioner) createSecretRef(nameSpace string, secretName s
 
 	secretRef := &v1.SecretReference{}
 	if secret != nil {
-		_, err = p.client.CoreV1().Secrets(nameSpace).Create(secret)
+		_, err = p.client.CoreV1().Secrets(nameSpace).Create(context.TODO(), secret, metav1.CreateOptions{})
 		if err != nil && errors.IsAlreadyExists(err) {
 
 			klog.V(1).Infof("secret %s already exist in namespace %s", secret, nameSpace)
@@ -622,7 +623,7 @@ func (p *glusterBlockProvisioner) Delete(volume *v1.PersistentVolume) error {
 	}
 
 	if volume.Annotations["AccessKey"] != "" && volume.Annotations["AccessKeyNs"] != "" {
-		deleteSecErr := p.client.CoreV1().Secrets(volume.Annotations["AccessKeyNs"]).Delete(volume.Annotations["AccessKey"], nil)
+		deleteSecErr := p.client.CoreV1().Secrets(volume.Annotations["AccessKeyNs"]).Delete(context.TODO(), volume.Annotations["AccessKey"], metav1.DeleteOptions{})
 
 		if deleteSecErr != nil && errors.IsNotFound(deleteSecErr) {
 			klog.V(1).Infof("secret %s does not exist in namespace %s", volume.Annotations["AccessKey"], volume.Annotations["AccessKeyNs"])
@@ -863,7 +864,7 @@ func GetSecretForPV(restSecretNamespace, restSecretName, volumePluginName string
 	if kubeClient == nil {
 		return secret, fmt.Errorf("Cannot get kube client")
 	}
-	secrets, err := kubeClient.CoreV1().Secrets(restSecretNamespace).Get(restSecretName, metav1.GetOptions{})
+	secrets, err := kubeClient.CoreV1().Secrets(restSecretNamespace).Get(context.TODO(), restSecretName, metav1.GetOptions{})
 	if err != nil {
 		return secret, err
 	}

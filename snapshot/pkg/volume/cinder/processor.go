@@ -123,7 +123,7 @@ func (c *cinderPlugin) SnapshotRestore(snapshotData *crdv1.VolumeSnapshotData, p
 	snapID := snapshotData.Spec.CinderSnapshot.SnapshotID
 	volName := pvName
 	capacity := pvc.Spec.Resources.Requests[v1.ResourceName(v1.ResourceStorage)]
-	szGB := helpers.RoundUpToGB(capacity)
+	szGB,_ := helpers.RoundUpToGiB(capacity)
 
 	for k, v := range parameters {
 		switch strings.ToLower(k) {

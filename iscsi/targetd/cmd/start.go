@@ -20,7 +20,7 @@ import (
 	"fmt"
 
 	"github.com/kubernetes-incubator/external-storage/iscsi/targetd/provisioner"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/controller"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/controller"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

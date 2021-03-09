@@ -103,7 +103,7 @@ func (plugin *gcePersistentDiskPlugin) SnapshotRestore(snapshotData *crdv1.Volum
 	diskName := pvName
 	capacity := pvc.Spec.Resources.Requests[v1.ResourceName(v1.ResourceStorage)]
 	// GCE works with gigabytes, convert to GiB with rounding up
-	requestGB := helpers.RoundUpToGB(capacity)
+	requestGB, _ := helpers.RoundUpToGiB(capacity)
 
 	// Apply Parameters (case-insensitive). We leave validation of
 	// the values to the cloud provider.

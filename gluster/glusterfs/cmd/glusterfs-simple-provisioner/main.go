@@ -21,7 +21,7 @@ import (
 	"strings"
 
 	vol "github.com/kubernetes-incubator/external-storage/gluster/glusterfs/pkg/volume"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/controller"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/controller"
 	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apimachinery/pkg/util/wait"

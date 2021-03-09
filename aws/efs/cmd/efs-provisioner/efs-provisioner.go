@@ -34,9 +34,9 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/klog"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/controller"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/gidallocator"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/mount"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/controller"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/gidallocator"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/mount"
 )
 
 const (

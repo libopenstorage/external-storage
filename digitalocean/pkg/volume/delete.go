@@ -19,7 +19,7 @@ package volume
 import (
 	"fmt"
 
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/controller"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/controller"
 	"k8s.io/api/core/v1"
 	"k8s.io/klog"
 )

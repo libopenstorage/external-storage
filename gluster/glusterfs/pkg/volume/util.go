@@ -17,13 +17,14 @@ limitations under the License.
 package volume
 
 import (
+	"context"
 	"fmt"
 
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/util"
 	"k8s.io/api/core/v1"
 	storage "k8s.io/api/storage/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/util"
 )
 
 // GetClassForVolume returns StorageClass
@@ -36,7 +37,7 @@ func GetClassForVolume(kubeClient kubernetes.Interface, pv *v1.PersistentVolume)
 		return nil, fmt.Errorf("Volume has no storage class")
 	}
 
-	class, err := kubeClient.StorageV1().StorageClasses().Get(className, metav1.GetOptions{})
+	class, err := kubeClient.StorageV1().StorageClasses().Get(context.TODO(), className, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}

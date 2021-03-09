@@ -17,6 +17,7 @@ limitations under the License.
 package util
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -60,7 +61,7 @@ func NewAPIUtil(client *kubernetes.Clientset) APIUtil {
 func (u *apiUtil) CreatePV(pv *v1.PersistentVolume) (*v1.PersistentVolume, error) {
 	startTime := time.Now()
 	metrics.APIServerRequestsTotal.WithLabelValues(metrics.APIServerRequestCreate).Inc()
-	pv, err := u.client.CoreV1().PersistentVolumes().Create(pv)
+	pv, err := u.client.CoreV1().PersistentVolumes().Create(context.TODO(), pv, metav1.CreateOptions{})
 	metrics.APIServerRequestsDurationSeconds.WithLabelValues(metrics.APIServerRequestCreate).Observe(time.Since(startTime).Seconds())
 	if err != nil {
 		metrics.APIServerRequestsFailedTotal.WithLabelValues(metrics.APIServerRequestCreate).Inc()
@@ -72,7 +73,7 @@ func (u *apiUtil) CreatePV(pv *v1.PersistentVolume) (*v1.PersistentVolume, error
 func (u *apiUtil) DeletePV(pvName string) error {
 	startTime := time.Now()
 	metrics.APIServerRequestsTotal.WithLabelValues(metrics.APIServerRequestDelete).Inc()
-	err := u.client.CoreV1().PersistentVolumes().Delete(pvName, &metav1.DeleteOptions{})
+	err := u.client.CoreV1().PersistentVolumes().Delete(context.TODO(), pvName, metav1.DeleteOptions{})
 	metrics.APIServerRequestsDurationSeconds.WithLabelValues(metrics.APIServerRequestDelete).Observe(time.Since(startTime).Seconds())
 	if err != nil {
 		metrics.APIServerRequestsFailedTotal.WithLabelValues(metrics.APIServerRequestDelete).Inc()
@@ -81,7 +82,7 @@ func (u *apiUtil) DeletePV(pvName string) error {
 }
 
 func (u *apiUtil) CreateJob(job *batch_v1.Job) error {
-	_, err := u.client.BatchV1().Jobs(job.Namespace).Create(job)
+	_, err := u.client.BatchV1().Jobs(job.Namespace).Create(context.TODO(), job, metav1.CreateOptions{})
 	if err != nil {
 		return err
 	}
@@ -90,7 +91,7 @@ func (u *apiUtil) CreateJob(job *batch_v1.Job) error {
 
 func (u *apiUtil) DeleteJob(jobName string, namespace string) error {
 	deleteProp := metav1.DeletePropagationForeground
-	if err := u.client.BatchV1().Jobs(namespace).Delete(jobName, &metav1.DeleteOptions{PropagationPolicy: &deleteProp}); err != nil {
+	if err := u.client.BatchV1().Jobs(namespace).Delete(context.TODO(), jobName, metav1.DeleteOptions{PropagationPolicy: &deleteProp}); err != nil {
 		return err
 	}
 

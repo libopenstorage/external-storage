@@ -21,14 +21,14 @@ import (
 	"regexp"
 	"sort"
 
-	"github.com/go-ozzo/ozzo-validation"
+	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
 )
 
 var (
 	// Restricting the deviceName to much smaller subset of Unix Path
 	// as unix path takes almost everything except NULL
-	deviceNameRe = regexp.MustCompile("^/[a-zA-Z0-9_./-]+$")
+	deviceNameRe = regexp.MustCompile("^/[a-zA-Z0-9_.:/-]+$")
 
 	// Volume name constraints decided by looking at
 	// "cli_validate_volname" function in cli-cmd-parser.c of gluster code
@@ -181,6 +181,8 @@ type DeviceInfo struct {
 	Device
 	Storage StorageSize `json:"storage"`
 	Id      string      `json:"id"`
+	Paths   []string    `json:"paths,omitempty"`
+	PvUUID  string      `json:"pv_uuid,omitempty"`
 }
 
 type DeviceInfoResponse struct {
@@ -226,8 +228,10 @@ type ClusterFlags struct {
 
 type Cluster struct {
 	Volumes []VolumeInfoResponse `json:"volumes"`
-	Nodes   []NodeInfoResponse   `json:"nodes"`
-	Id      string               `json:"id"`
+	//currently BlockVolumes will be used only for metrics
+	BlockVolumes []BlockVolumeInfoResponse `json:"blockvolumes,omitempty"`
+	Nodes        []NodeInfoResponse        `json:"nodes"`
+	Id           string                    `json:"id"`
 	ClusterFlags
 }
 
@@ -302,6 +306,28 @@ func (volCreateRequest VolumeCreateRequest) Validate() error {
 	)
 }
 
+type BlockRestriction string
+
+const (
+	Unrestricted   BlockRestriction = ""
+	Locked         BlockRestriction = "locked"
+	LockedByUpdate BlockRestriction = "locked-by-update"
+)
+
+func (br BlockRestriction) String() string {
+	switch br {
+	case Unrestricted:
+		return "(none)"
+	case Locked:
+		return "locked"
+	case LockedByUpdate:
+		return "locked-by-update"
+	default:
+		return "unknown"
+
+	}
+}
+
 type VolumeInfo struct {
 	VolumeCreateRequest
 	Id      string `json:"id"`
@@ -315,7 +341,9 @@ type VolumeInfo struct {
 	} `json:"mount"`
 	BlockInfo struct {
 		FreeSize     int              `json:"freesize,omitempty"`
+		ReservedSize int              `json:"reservedsize,omitempty"`
 		BlockVolumes sort.StringSlice `json:"blockvolume,omitempty"`
+		Restriction  BlockRestriction `json:"restriction,omitempty"`
 	} `json:"blockinfo,omitempty"`
 }
 
@@ -346,6 +374,16 @@ func (vcr VolumeCloneRequest) Validate() error {
 	return validation.ValidateStruct(&vcr,
 		validation.Field(&vcr.Name, validation.Match(volumeNameRe)),
 	)
+}
+
+type VolumeBlockRestrictionRequest struct {
+	Restriction BlockRestriction `json:"restriction"`
+}
+
+func (vbrr VolumeBlockRestrictionRequest) Validate() error {
+	return validation.ValidateStruct(&vbrr,
+		validation.Field(&vbrr.Restriction,
+			validation.In(Unrestricted, Locked)))
 }
 
 // BlockVolume
@@ -469,6 +507,8 @@ func (v *VolumeInfoResponse) String() string {
 		"Mount Options: backup-volfile-servers=%v\n"+
 		"Block: %v\n"+
 		"Free Size: %v\n"+
+		"Reserved Size: %v\n"+
+		"Block Hosting Restriction: %v\n"+
 		"Block Volumes: %v\n"+
 		"Durability Type: %v\n",
 		v.Name,
@@ -479,6 +519,8 @@ func (v *VolumeInfoResponse) String() string {
 		v.Mount.GlusterFS.Options["backup-volfile-servers"],
 		v.Block,
 		v.BlockInfo.FreeSize,
+		v.BlockInfo.ReservedSize,
+		v.BlockInfo.Restriction,
 		v.BlockInfo.BlockVolumes,
 		v.Durability.Type)
 
@@ -497,23 +539,6 @@ func (v *VolumeInfoResponse) String() string {
 		s += fmt.Sprintf("Snapshot Factor: %.2f\n",
 			v.Snapshot.Factor)
 	}
-
-	/*
-		s += "\nBricks:\n"
-		for _, b := range v.Bricks {
-			s += fmt.Sprintf("Id: %v\n"+
-				"Path: %v\n"+
-				"Size (GiB): %v\n"+
-				"Node: %v\n"+
-				"Device: %v\n\n",
-				b.Id,
-				b.Path,
-				b.Size/(1024*1024),
-				b.NodeId,
-				b.DeviceId)
-		}
-	*/
-
 	return s
 }
 
@@ -567,4 +592,91 @@ func (v *BlockVolumeInfoResponse) String() string {
 	*/
 
 	return s
+}
+
+type OperationsInfo struct {
+	Total    uint64 `json:"total"`
+	InFlight uint64 `json:"in_flight"`
+	// state based counts:
+	Stale  uint64 `json:"stale"`
+	Failed uint64 `json:"failed"`
+	New    uint64 `json:"new"`
+}
+
+type AdminState string
+
+const (
+	AdminStateNormal   AdminState = "normal"
+	AdminStateReadOnly AdminState = "read-only"
+	AdminStateLocal    AdminState = "local-client"
+)
+
+type AdminStatus struct {
+	State AdminState `json:"state"`
+}
+
+func (as AdminStatus) Validate() error {
+	return validation.ValidateStruct(&as,
+		validation.Field(&as.State,
+			validation.Required,
+			validation.In(AdminStateNormal, AdminStateReadOnly, AdminStateLocal)))
+}
+
+// DeviceDeleteOptions is used to specify additional behavior for device
+// deletes.
+type DeviceDeleteOptions struct {
+	// force heketi to forget about a device, possibly
+	// orphaning metadata on the node
+	ForceForget bool `json:"forceforget"`
+}
+
+// PendingOperationInfo contains metadata to summarize a pending
+// operation.
+type PendingOperationInfo struct {
+	Id        string `json:"id"`
+	TypeName  string `json:"type_name"`
+	Status    string `json:"status"`
+	SubStatus string `json:"sub_status"`
+	// TODO label, timestamp?
+}
+
+type PendingChangeInfo struct {
+	Id          string `json:"id"`
+	Description string `json:"description"`
+}
+
+type PendingOperationDetails struct {
+	PendingOperationInfo
+	Changes []PendingChangeInfo `json:"changes"`
+}
+
+type PendingOperationListResponse struct {
+	PendingOperations []PendingOperationInfo `json:"pendingoperations"`
+}
+
+type PendingOperationsCleanRequest struct {
+	Operations []string `json:"operations,omitempty"`
+}
+
+func (pocr PendingOperationsCleanRequest) Validate() error {
+	return validation.ValidateStruct(&pocr,
+		validation.Field(&pocr.Operations, validation.By(ValidateIds)),
+	)
+}
+
+func ValidateIds(v interface{}) error {
+	ids, ok := v.([]string)
+	if !ok {
+		return fmt.Errorf("must be a list of strings")
+	}
+	if len(ids) > 32 {
+		return fmt.Errorf("too many ids specified (%v), up to %v supported",
+			len(ids), 32)
+	}
+	for _, id := range ids {
+		if err := ValidateUUID(id); err != nil {
+			return err
+		}
+	}
+	return nil
 }
