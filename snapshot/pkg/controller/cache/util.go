@@ -28,5 +28,5 @@ import (
 // MakeSnapshotName makes a full name for a snapshot that includes
 // the namespace and the short name
 func MakeSnapshotName(snapshot *crdv1.VolumeSnapshot) string {
-	return snapshot.Metadata.Namespace + "/" + snapshot.Metadata.Name + "-" + string(snapshot.Metadata.UID)
+	return snapshot.Namespace + "/" + snapshot.Name + "-" + string(snapshot.UID)
 }

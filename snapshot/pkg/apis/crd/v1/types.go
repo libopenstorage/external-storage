@@ -89,8 +89,8 @@ type VolumeSnapshotCondition struct {
 // snapshot by the volume provider it is bound to the corresponding VolumeSnapshotData through
 // the VolumeSnapshotSpec
 type VolumeSnapshot struct {
-	metav1.TypeMeta `json:",inline"`
-	Metadata        metav1.ObjectMeta `json:"metadata"`
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata"`
 
 	// Spec represents the desired state of the snapshot
 	// +optional
@@ -106,7 +106,7 @@ type VolumeSnapshot struct {
 // VolumeSnapshotList is a list of VolumeSnapshot objects
 type VolumeSnapshotList struct {
 	metav1.TypeMeta `json:",inline"`
-	Metadata        metav1.ListMeta  `json:"metadata"`
+	metav1.ListMeta `json:"metadata"`
 	Items           []VolumeSnapshot `json:"items"`
 }
 
@@ -136,7 +136,7 @@ type VolumeSnapshotDataStatus struct {
 // VolumeSnapshotDataList is a list of VolumeSnapshotData objects
 type VolumeSnapshotDataList struct {
 	metav1.TypeMeta `json:",inline"`
-	Metadata        metav1.ListMeta      `json:"metadata"`
+	metav1.ListMeta `json:"metadata"`
 	Items           []VolumeSnapshotData `json:"items"`
 }
 
@@ -178,7 +178,7 @@ type VolumeSnapshotDataCondition struct {
 type VolumeSnapshotData struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
-	Metadata metav1.ObjectMeta `json:"metadata"`
+	metav1.ObjectMeta `json:"metadata"`
 
 	// Spec represents the desired state of the snapshot
 	// +optional
@@ -353,7 +353,7 @@ func (v *VolumeSnapshotData) GetObjectKind() schema.ObjectKind {
 
 // GetObjectMeta is required to satisfy ObjectMetaAccessor interface
 func (v *VolumeSnapshotData) GetObjectMeta() metav1.Object {
-	return &v.Metadata
+	return &v.ObjectMeta
 }
 
 // GetObjectKind is required to satisfy Object interface
@@ -363,7 +363,7 @@ func (vd *VolumeSnapshotDataList) GetObjectKind() schema.ObjectKind {
 
 // GetListMeta is required to satisfy ListMetaAccessor interface
 func (vd *VolumeSnapshotDataList) GetListMeta() metav1.ListInterface {
-	return &vd.Metadata
+	return &vd.ListMeta
 }
 
 // GetObjectKind is required to satisfy Object interface
@@ -373,7 +373,7 @@ func (v *VolumeSnapshot) GetObjectKind() schema.ObjectKind {
 
 // GetObjectMeta is required to satisfy ObjectMetaAccessor interface
 func (v *VolumeSnapshot) GetObjectMeta() metav1.Object {
-	return &v.Metadata
+	return &v.ObjectMeta
 }
 
 // GetObjectKind is required to satisfy Object interface
@@ -383,7 +383,7 @@ func (vd *VolumeSnapshotList) GetObjectKind() schema.ObjectKind {
 
 // GetListMeta is required to satisfy ListMetaAccessor interface
 func (vd *VolumeSnapshotList) GetListMeta() metav1.ListInterface {
-	return &vd.Metadata
+	return &vd.ListMeta
 }
 
 // VolumeSnapshotDataListCopy is a VolumeSnapshotDataList type
