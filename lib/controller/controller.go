@@ -53,7 +53,7 @@ import (
 	"k8s.io/client-go/tools/record"
 	ref "k8s.io/client-go/tools/reference"
 	"k8s.io/client-go/util/workqueue"
-	"k8s.io/kubernetes/pkg/apis/core/v1/helper"
+	volumehelper "k8s.io/component-helpers/storage/volume"
 )
 
 // annClass annotation represents the storage class associated with a resource:
@@ -831,7 +831,7 @@ func (ctrl *ProvisionController) shouldProvision(claim *v1.PersistentVolumeClaim
 		}
 	} else {
 		// Kubernetes 1.4 provisioning, evaluating class.Provisioner
-		claimClass := helper.GetPersistentVolumeClaimClass(claim)
+		claimClass := volumehelper.GetPersistentVolumeClaimClass(claim)
 		provisioner, _, err := ctrl.getStorageClassFields(claimClass)
 		if err != nil {
 			glog.Errorf("Error getting claim %q's StorageClass's fields: %v", claimToClaimKey(claim), err)
@@ -923,7 +923,7 @@ func (ctrl *ProvisionController) updateDeleteStats(volume *v1.PersistentVolume, 
 // (requeue the claim) or not
 func (ctrl *ProvisionController) provisionClaimOperation(claim *v1.PersistentVolumeClaim) error {
 	// Most code here is identical to that found in controller.go of kube's PV controller...
-	claimClass := helper.GetPersistentVolumeClaimClass(claim)
+	claimClass := volumehelper.GetPersistentVolumeClaimClass(claim)
 	operation := fmt.Sprintf("provision %q class %q", claimToClaimKey(claim), claimClass)
 	glog.Info(logOperation(operation, "started"))
 
